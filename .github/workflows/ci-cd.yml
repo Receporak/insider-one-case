@@ -39,7 +39,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
 
       - name: Run Pint (dry-run)
-        run: ./vendor/bin/pint --test
+        run: ./vendor/bin/pint --test --dirty
 
   # ---------------------------------------------------------------------------
   # 2. Tests — PHPUnit (SQLite in-memory, facades mocked)

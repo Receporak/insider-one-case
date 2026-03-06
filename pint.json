@@ -1,0 +1,12 @@
+{
+    "preset": "psr12",
+    "rules": {
+        "header_comment": false,
+        "blank_line_after_namespace": false,
+        "indentation_type": false,
+        "line_ending": false,
+        "constant_case": false,
+        "lowercase_keywords": false,
+        "lowercase_static_reference": false
+    }
+}
