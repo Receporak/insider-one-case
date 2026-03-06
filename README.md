@@ -44,13 +44,13 @@ docker compose exec app php artisan l5-swagger:generate
 
 Kurulum tamamlandıktan sonra proje servislerine aşağıdaki adreslerden ulaşabilirsiniz:
 
-- **API Base URL:** `http://localhost:8000/api`
+- **API Base URL:** `http://localhost:8000/api/v1`
 - **Swagger API Dokümantasyonu:** `http://localhost:8000/api/documentation`
-- **Sistem Sağlık Durumu (Health Check):** `http://localhost:8000/api/health`
+- **Sistem Sağlık Durumu (Health Check):** `http://localhost:8000/api/v1/health`
 
 ---
 
-## � Sık Kullanılan Komutlar
+##  Sık Kullanılan Komutlar
 
 Sistemi yönetirken kullanabileceğiniz bazı temel komutlar:
 

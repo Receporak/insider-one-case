@@ -88,13 +88,13 @@ class NotificationTemplateControllerTest extends TestCase
 
     public function test_create_accepts_all_valid_channels(): void
     {
-        foreach (['sms', 'email', 'push'] as $channel) {
-            $mockResponse = BaseResponse::success([], 'Created', 201);
-            $this->mock(NotificationTemplateService::class)
-                 ->shouldReceive('create')
-                 ->once()
-                 ->andReturn($mockResponse);
+        $mockResponse = BaseResponse::success([], 'Created', 201);
+        $this->mock(NotificationTemplateService::class)
+             ->shouldReceive('create')
+             ->times(3)
+             ->andReturn($mockResponse);
 
+        foreach (['sms', 'email', 'push'] as $channel) {
             $payload            = $this->validPayload;
             $payload['channel'] = $channel;
 
