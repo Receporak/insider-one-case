@@ -1,0 +1,1097 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Insider One - Notification API",
+        "description": "Toplu bildirim ve şablon yönetimi için REST API dokümantasyonu.",
+        "contact": {
+            "name": "Insider Dev Team",
+            "email": "dev@insider.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "Local Development Server"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Sistem sağlık durumu",
+                "description": "Veritabanı, Redis ve Queue bağlantılarının durumunu döner.",
+                "operationId": "health.check",
+                "responses": {
+                    "200": {
+                        "description": "Tüm servisler sağlıklı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "example": "2026-03-06T12:00:00Z"
+                                        },
+                                        "services": {
+                                            "properties": {
+                                                "database": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "up"
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "example": "OK"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "redis": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "up"
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "example": "OK"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "queue": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "up"
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "example": "OK"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Bir veya daha fazla servis çalışmıyor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "unhealthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "example": "2026-03-06T12:00:00Z"
+                                        },
+                                        "services": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics/notifications": {
+            "get": {
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Notification metrikleri",
+                "description": "Queue depth, success/failure rates ve ortalama latency bilgisini döner.",
+                "operationId": "metrics.notifications",
+                "responses": {
+                    "200": {
+                        "description": "Metrik verisi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "example": "2026-03-06T12:00:00Z"
+                                        },
+                                        "services": {
+                                            "properties": {
+                                                "queue_depth": {
+                                                    "properties": {
+                                                        "high": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "default": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "low": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 20
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "rates": {
+                                                    "properties": {
+                                                        "sent": {
+                                                            "type": "integer",
+                                                            "example": 150
+                                                        },
+                                                        "failed": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        },
+                                                        "pending": {
+                                                            "type": "integer",
+                                                            "example": 20
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 180
+                                                        },
+                                                        "success_rate_pct": {
+                                                            "type": "number",
+                                                            "example": 93.75
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "latency": {
+                                                    "properties": {
+                                                        "avg_seconds": {
+                                                            "type": "number",
+                                                            "example": 2.45
+                                                        },
+                                                        "min_seconds": {
+                                                            "type": "number",
+                                                            "example": 0.12
+                                                        },
+                                                        "max_seconds": {
+                                                            "type": "number",
+                                                            "example": 15.3
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 150
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Bildirim listesi",
+                "description": "Bildirim listesini döner.",
+                "operationId": "notification.list",
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "description": "Kanal",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "sms"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Durum",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "pending"
+                        }
+                    },
+                    {
+                        "name": "batch_id",
+                        "in": "query",
+                        "description": "Batch ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    },
+                    {
+                        "name": "first_date",
+                        "in": "query",
+                        "description": "İlk tarih",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "2022-01-01"
+                        }
+                    },
+                    {
+                        "name": "last_date",
+                        "in": "query",
+                        "description": "Son tarih",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "2022-12-31"
+                        }
+                    },
+                    {
+                        "name": "item_per_page",
+                        "in": "query",
+                        "description": "Sayfa başına öğe sayısı",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Sayfa numarası",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bildirim listesi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Toplu bildirim oluştur",
+                "description": "Bir veya birden fazla bildirimi aynı anda oluşturur ve kuyruğa ekler.",
+                "operationId": "notification.insert",
+                "requestBody": {
+                    "description": "Bildirim listesi",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/NotificationItem"
+                                }
+                            },
+                            "example": [
+                                {
+                                    "recipient": "905321234567",
+                                    "channel": "sms",
+                                    "template_id": "123e4567-e89b-12d3-a456-426614174000",
+                                    "priority": "high"
+                                },
+                                {
+                                    "recipient": "user@example.com",
+                                    "channel": "email",
+                                    "template_id": "123e4567-e89b-12d3-a456-426614174000",
+                                    "priority": "normal"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Bildirimler başarıyla oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasyon hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification/{recipient}": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Alıcıya göre bildirim getir",
+                "description": "Belirtilen alıcıya ait bildirimleri döner.",
+                "operationId": "notification.findByRecipient",
+                "parameters": [
+                    {
+                        "name": "recipient",
+                        "in": "path",
+                        "description": "Alıcı değeri (telefon, e-posta veya device token)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "905321234567"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bildirim bulundu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bildirim bulunamadı veya sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification/{id}": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "ID'ye göre bildirim getir",
+                "operationId": "notification.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bildirim",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bulunamadı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Alıcıya ait bildirimi güncelle",
+                "description": "Belirtilen alıcıya ait bildirim kayıtlarını günceller.",
+                "operationId": "notification.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Bildirim ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "7bb61a62-1263-406a-b20d-081aff51ad5d"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "recipient": {
+                                        "type": "string",
+                                        "example": "905321234567"
+                                    },
+                                    "channel": {
+                                        "type": "string",
+                                        "example": "sms"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "sent"
+                                    },
+                                    "batch_id": {
+                                        "type": "string",
+                                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bildirim güncellendi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasyon hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Alıcıya ait bildirimi sil",
+                "description": "Belirtilen alıcıya ait tüm bildirim kayıtlarını siler.",
+                "operationId": "notification.delete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Bildirim ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bildirim silindi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification/findByBatchId/{batchId}": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Batch ID'ye göre bildirimleri getir",
+                "operationId": "notification.findByBatchId",
+                "parameters": [
+                    {
+                        "name": "batchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bildirim listesi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification/updateByBatchId/{batchId}": {
+            "put": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Alıcıya ait bildirimi güncelle",
+                "description": "Belirtilen alıcıya ait bildirim kayıtlarını günceller.",
+                "operationId": "notification.updateByBatchId",
+                "parameters": [
+                    {
+                        "name": "batchId",
+                        "in": "path",
+                        "description": "Bildirim Batch ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "7bb61a62-1263-406a-b20d-081aff51ad5d"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "sent"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bildirim güncellendi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasyon hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification-template": {
+            "post": {
+                "tags": [
+                    "Notification Templates"
+                ],
+                "summary": "Bildirim şablonu oluştur",
+                "description": "Yeni bir bildirim şablonu oluşturur.",
+                "operationId": "notificationTemplate.insert",
+                "requestBody": {
+                    "description": "Şablon bilgileri",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "order_shipped"
+                                    },
+                                    "channel": {
+                                        "type": "string",
+                                        "example": "sms"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Siparişiniz kargoya verildi."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "name": "order_shipped",
+                                "channel": "sms",
+                                "content": "Siparişiniz kargoya verildi.",
+                                "status": "active"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Şablon başarıyla oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasyon hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notification-template/{id}": {
+            "get": {
+                "tags": [
+                    "Notification Templates"
+                ],
+                "summary": "ID ile şablon getir",
+                "description": "UUID ile bir bildirim şablonunu getirir.",
+                "operationId": "notificationTemplate.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Şablon UUID'si",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "550e8400-e29b-41d4-a716-446655440000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Şablon bulundu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Şablon bulunamadı veya sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Notification Templates"
+                ],
+                "summary": "Bildirim şablonunu güncelle",
+                "description": "Belirtilen UUID'ye sahip şablonu günceller.",
+                "operationId": "notificationTemplate.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Şablon UUID'si",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "550e8400-e29b-41d4-a716-446655440000"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/NotificationTemplateItem"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Şablon güncellendi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasyon hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Notification Templates"
+                ],
+                "summary": "Bildirim şablonunu sil",
+                "description": "Belirtilen UUID'ye sahip şablonu siler.",
+                "operationId": "notificationTemplate.delete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Şablon UUID'si",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "550e8400-e29b-41d4-a716-446655440000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Şablon silindi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sunucu hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "NotificationItem": {
+                "required": [
+                    "recipient",
+                    "channel",
+                    "content",
+                    "priority"
+                ],
+                "properties": {
+                    "recipient": {
+                        "description": "Alıcı (telefon, e-posta veya device token)",
+                        "type": "string",
+                        "example": "905321234567"
+                    },
+                    "channel": {
+                        "description": "Bildirim kanalı",
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "email",
+                            "push"
+                        ],
+                        "example": "sms"
+                    },
+                    "content": {
+                        "description": "Bildirim içeriği",
+                        "type": "string",
+                        "example": "Merhaba! Siparişiniz kargoya verildi."
+                    },
+                    "priority": {
+                        "description": "Gönderim önceliği",
+                        "type": "string",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high"
+                        ],
+                        "example": "high"
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationTemplateItem": {
+                "required": [
+                    "name",
+                    "channel",
+                    "content"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Şablon adı",
+                        "type": "string",
+                        "example": "order_shipped"
+                    },
+                    "channel": {
+                        "description": "Kanal",
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "email",
+                            "push"
+                        ],
+                        "example": "email"
+                    },
+                    "content": {
+                        "description": "Şablon içeriği",
+                        "type": "string",
+                        "example": "Merhaba, siparişiniz kargoya verilmiştir."
+                    },
+                    "status": {
+                        "description": "Şablon durumu",
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "example": "active"
+                    }
+                },
+                "type": "object"
+            },
+            "BaseResponse": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "nullable": true
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 200
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "error"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Validation failed"
+                    },
+                    "data": {
+                        "example": null,
+                        "nullable": true
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 400
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationErrorResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Notifications",
+            "description": "Toplu bildirim gönderme ve yönetme işlemleri"
+        },
+        {
+            "name": "Notification Templates",
+            "description": "Bildirim şablonu oluşturma ve yönetme işlemleri"
+        },
+        {
+            "name": "Health",
+            "description": "Health"
+        },
+        {
+            "name": "Metrics",
+            "description": "Metrics"
+        }
+    ]
+}
